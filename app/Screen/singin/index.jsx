@@ -7,11 +7,12 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { AuthContext } from "../../context/AuthProvider";
 import Toast from "react-native-toast-message";
+import * as Notifications from "expo-notifications";
 
 const Signin = () => {
   const router = useRouter();
@@ -20,6 +21,27 @@ const Signin = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const requestPermission = async () => {
+      const { status } = await Notifications.getPermissionsAsync();
+      if (status !== "granted") {
+        alert("You need to enable permissions in settings");
+      }
+    };
+    requestPermission();
+  }, []);
+
+  const sendNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Welcome to the app",
+        body: "You are now logged in",
+        sound: true,
+      },
+      trigger: null,
+    });
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -34,12 +56,14 @@ const Signin = () => {
     setIsLoading(true);
     try {
       await login(email, password);
+      sendNotification();
       Toast.show({
         type: "success",
         text1: "Login Successful",
         text2: "You are now logged in",
       });
     } catch (error) {
+      sendNotification();
       Toast.show({
         type: "error",
         text1: "Login Error",

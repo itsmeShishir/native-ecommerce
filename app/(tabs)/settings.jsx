@@ -21,7 +21,7 @@ const Settings = () => {
       {/* Header */}
       <View style={styles.header}>
         <Image
-          source={require("@/assets/images/icon.png")}
+          source={require("@/assets/images/splash-icon.png")}
           style={styles.headerImage}
         />
         <Text style={styles.headerText}>Welcome, {emails || "User"}</Text>
